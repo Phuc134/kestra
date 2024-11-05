@@ -16,6 +16,7 @@ import taskrun from "./taskruns"
 import trigger from "./trigger";
 import editor from "./editor";
 import doc from "./doc";
+import dashboard from "./dashboard";
 import starred from "./starred";
 
 export default {
@@ -38,6 +39,7 @@ export default {
         trigger,
         editor,
         doc,
-        starred
+        starred,
+        dashboard
     }
 }

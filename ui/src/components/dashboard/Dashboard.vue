@@ -2,9 +2,13 @@
     <Header
         v-if="!embed"
         :title="custom.shown ? custom.dashboard.title : t('overview')"
-        :breadcrumb="
-            custom.shown ? breadcrumb : [{label: t('dashboard_label')}]
-        "
+        :breadcrumb="[
+            {
+                label: t(custom ? 'custom_dashboard' : 'dashboard_label'),
+                link: {},
+            },
+        ]"
+        :id="custom.dashboard.id ?? undefined"
     />
 
     <div class="dashboard-filters">
@@ -213,7 +217,7 @@
 
 <script setup>
     import {onBeforeMount, ref, computed, watch} from "vue";
-    import {useRoute} from "vue-router";
+    import {useRoute, useRouter} from "vue-router";
     import {useStore} from "vuex";
     import {useI18n} from "vue-i18n";
 
@@ -248,7 +252,7 @@
     import action from "../../models/action.js";
     // import {storageKeys} from "../../utils/constants";
 
-    // const router = useRouter();
+    const router = useRouter();
 
     const route = useRoute();
     const store = useStore();
@@ -286,17 +290,22 @@
     const handleCustomUpdate = async (v) => {
         let dashboard = {};
 
-        if (v) dashboard = await store.dispatch("dashboard/load", props.id);
+        if (route.name === "home") {
+            router.replace({params: {...route.params, id: v?.id ?? "default"}});
+            if (v && v.id !== "default") {
+                dashboard = await store.dispatch("dashboard/load", v.id);
+            }
 
-        custom.value = {shown: !!v, dashboard};
+            custom.value = {
+                shown: !v || v.id === "default" ? false : true,
+                dashboard,
+            };
+        }
     };
     const types = {
         "io.kestra.plugin.core.dashboard.chart.TimeSeries": TimeSeries,
         "io.kestra.plugin.core.dashboard.chart.Markdown": Markdown,
     };
-    const breadcrumb = [
-        {label: t("custom_dashboards"), link: {name: "dashboards/list"}},
-    ];
 
     const descriptionDialog = ref(false);
     const description = props.flow
@@ -487,6 +496,7 @@
     });
 
     onBeforeMount(() => {
+        handleCustomUpdate(route.params?.id ? {id: route.params?.id} : undefined);
         // if (!route.query.namespace && props.restoreURL) {
         //     router.replace({query: {...route.query, namespace: defaultNamespace}});
         //     filters.value.namespace = route.query.namespace || defaultNamespace;

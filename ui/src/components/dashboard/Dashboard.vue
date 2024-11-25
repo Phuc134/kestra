@@ -45,16 +45,18 @@
                     </p>
                     <p
                         v-if="chart.chartOptions?.description"
-                        class="m-0 fw-light small"
+                        class="m-0 fw-light"
                     >
-                        {{ chart.chartOptions.description }}
+                        <small>{{ chart.chartOptions.description }}</small>
                     </p>
 
-                    <component
-                        :is="types[chart.type]"
-                        :source="chart.content"
-                        :chart
-                    />
+                    <div class="mt-4">
+                        <component
+                            :is="types[chart.type]"
+                            :source="chart.content"
+                            :chart
+                        />
+                    </div>
                 </div>
             </el-col>
         </el-row>
@@ -241,6 +243,7 @@
     import ExecutionsEmptyNextScheduled from "./components/tables/executions/EmptyNextScheduled.vue";
 
     import Markdown from "../layout/Markdown.vue";
+    import Table from "./components/tables/custom/Table.vue";
     import TimeSeries from "./components/charts/custom/TimeSeries.vue";
 
     import CheckBold from "vue-material-design-icons/CheckBold.vue";
@@ -305,6 +308,7 @@
     const types = {
         "io.kestra.plugin.core.dashboard.chart.TimeSeries": TimeSeries,
         "io.kestra.plugin.core.dashboard.chart.Markdown": Markdown,
+        "io.kestra.plugin.core.dashboard.chart.Table": Table,
     };
 
     const descriptionDialog = ref(false);
@@ -580,7 +584,7 @@
             & .el-col {
                 padding-bottom: $spacing;
 
-                &:nth-of-type(even) div {
+                &:nth-of-type(even) > div {
                     margin-left: 1rem;
                 }
 
